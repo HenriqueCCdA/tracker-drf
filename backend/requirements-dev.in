@@ -1,0 +1,15 @@
+-c requirements.txt
+pytest
+pytest-django
+pytest-cov
+pytest-xdist
+pytest-mock
+coverage
+black
+isort
+pyproject-flake8
+ipython
+ipdb
+pre-commit
+model_bakery
+faker

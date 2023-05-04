@@ -1,0 +1,25 @@
+FROM node:16-buster-slim
+
+ARG USER_DIR=/home/app
+
+# set work directory
+WORKDIR $USER_DIR
+
+# # Install basic SO and Python
+# RUN apt-get update && apt-get install -y \
+#   build-essential \
+#   && rm -rf /var/lib/apt/lists/* \
+
+#### Prepare Frontend Vuejs 3
+
+COPY ./package.json ./package-lock.json ./
+
+RUN npm install \
+  && npm cache clean --force \
+  && npm cache verify
+
+COPY . ./
+
+EXPOSE 8080
+
+CMD ["npm", "run", "serve"]

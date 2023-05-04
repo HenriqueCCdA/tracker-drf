@@ -1,0 +1,9 @@
+django
+djangorestframework
+python-decouple
+gunicorn
+dj_database_url
+psycopg
+django-extensions
+drf-spectacular
+django-cors-headers
