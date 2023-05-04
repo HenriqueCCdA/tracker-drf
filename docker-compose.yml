@@ -1,0 +1,53 @@
+services:
+
+  backend:
+    container_name: tracker_api
+    build:
+      dockerfile: docker/Dockerfile.dev
+      context: ./backend/
+    image: tracker_api:latest
+    volumes:
+      - ./backend:/home/app/
+    restart: 'no'
+    stdin_open: true   # Add this line into your service
+    tty: true   # Add this line into your service
+    env_file:
+      - backend/.env
+    environment:
+      - DATABASE_URL=postgres://tracker_user:123456@database:5432/tracker_user
+      - PYTHONBREAKPOINT=ipdb.set_trace
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
+
+  frontend:
+    container_name: tracker_front
+    build:
+      dockerfile: docker/Dockerfile.dev
+      context: ./frontend/
+    image: tracker_front:latest
+    volumes:
+      - ./frontend:/home/app/
+    restart: 'no'
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend
+
+  database:
+    container_name: tracker_db
+    image: postgres:15.1
+    restart: 'no'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      - LC_ALL=C.UTF-8
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_USER=tracker_user
+    ports:
+      - 5432:5432
+
+
+volumes:
+  pg_data:

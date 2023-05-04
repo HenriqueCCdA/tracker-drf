@@ -1,9 +1,9 @@
 # pyproject.toml
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "adopet.settings"
+DJANGO_SETTINGS_MODULE = "tracker.settings"
 addopts = "-vv"
 testpaths = [
-    "adopet",
+    "tracker",
 ]
 
 [tool.flake8]
@@ -23,5 +23,5 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-src_paths = ["adopet"]
+src_paths = ["tracker"]
 multi_line_output = 3
