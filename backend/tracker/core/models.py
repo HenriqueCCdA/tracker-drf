@@ -20,3 +20,16 @@ class Project(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class Task(BaseModel):
+    description = models.CharField(_("Descriação"), max_length=1000)
+    duration = models.PositiveIntegerField(_("Duração em sengundo"))
+
+    project = models.ForeignKey(Project, related_name="tasks", on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("description",)
+
+    def __str__(self):
+        return self.description

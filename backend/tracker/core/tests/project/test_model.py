@@ -1,13 +1,6 @@
 from datetime import datetime
 
-import pytest
-
 from tracker.core.models import Project
-
-
-@pytest.fixture
-def project(db):
-    return Project.objects.create(name="Projeto 1")
 
 
 def test_create(project):
@@ -19,7 +12,7 @@ def test_str(project):
     assert str(project) == "Projeto 1"
 
 
-def test_positive_default(project):
+def test_default(project):
     assert project.is_active
 
 
