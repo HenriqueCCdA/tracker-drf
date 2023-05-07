@@ -33,13 +33,14 @@ PHONNY: create_admin
 create_admin:
 	@docker compose exec -it backend ./manage.py createsuperuser
 
-PHONNY: pytest
-pytest:
+PHONNY: test
+test:
 	@docker compose run backend pytest -s -n 2
 
 PHONNY: linter
 linter:
 	@docker compose exec backend pflake8
+	@docker compose exec frontend npm run lint
 
 PHONNY: fmt
 fmt:

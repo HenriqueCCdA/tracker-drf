@@ -1,5 +1,5 @@
 import http from "@/http";
-import IProjeto from "@/interfaces/IProjeto";
+import {IProjeto, IProjetoApi} from "@/interfaces/IProjeto";
 import { Estado } from "@/store";
 import { ALTERAR_PROJETO, CADASTRAR_PROJETO, OBTER_PROJETOS, REMOVER_PROJETO } from "@/store/tipo-acoes";
 import { ADICIONA_PROJETO, ALTERA_PROJETO, DEFINIR_PROJETOS, EXCLUIR_PROJETO } from "@/store/tipo-mutacoes";
@@ -10,9 +10,6 @@ export interface EstadoProjeto{
 }
 
 export const projeto: Module<EstadoProjeto, Estado> =  {
-    // state: {
-    //     projetos: [],
-    // },
     mutations: {
         [ADICIONA_PROJETO](state, nomeDoProjeto: string) {
             const projeto = {
@@ -28,25 +25,29 @@ export const projeto: Module<EstadoProjeto, Estado> =  {
         [EXCLUIR_PROJETO](state, id: string) {
             state.projetos = state.projetos.filter(proj => proj.id != id)
         },
-        [DEFINIR_PROJETOS](state, projetos: IProjeto[]) {
-            state.projetos = projetos
+        [DEFINIR_PROJETOS](state, projetos: IProjetoApi[]) {
+            const projeto_lista: IProjeto[] = []
+            for(const p of projetos){
+                projeto_lista.push({"id": p.id, "nome": p.name})
+            }
+            state.projetos = projeto_lista
         },
     },
     actions: {
         [OBTER_PROJETOS] ({ commit }) {
-            http.get('/projetos')
-                .then(resposta => commit(DEFINIR_PROJETOS, resposta.data))
+            http.get('/project/')
+                .then(resposta => commit(DEFINIR_PROJETOS, resposta.data.results))
         },
         [CADASTRAR_PROJETO] (context, nomeDoProjeto: string) {
-            return http.post('/projetos', {
-                nome: nomeDoProjeto
+            return http.post('/project/', {
+                name: nomeDoProjeto
             })
         },
         [ALTERAR_PROJETO] (context, projeto: IProjeto) {
-            return http.put(`/projetos/${projeto.id}`, projeto)
+            return http.put(`/project/${projeto.id}/`, {"name": projeto.nome})
         },
         [REMOVER_PROJETO] ({commit}, id: string) {
-            return http.delete(`/projetos/${id}`)
+            return http.delete(`/project/${id}`)
                 .then(() => commit(EXCLUIR_PROJETO, id))
         },
     }

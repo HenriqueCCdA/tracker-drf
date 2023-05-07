@@ -47,7 +47,7 @@ export default defineComponent({
       nomeDoProjeto.value = projeto?.nome || ''
     }
 
-    const lidarComSucesso = () => {
+    const lidarComSucessoCadasto = () => {
       nomeDoProjeto.value = "";
       notificar(
         TipoNotificacao.SUCESSO,
@@ -57,15 +57,38 @@ export default defineComponent({
       router.push('/projetos')
     }
 
+    const lidarComSucessoDaAtualizacao = () => {
+      nomeDoProjeto.value = "";
+      notificar(
+        TipoNotificacao.SUCESSO,
+        'Excelente!',
+        'O projeto foi atualizado com sucesso!'
+      )
+      router.push('/projetos')
+    }
+
+    const lidarComErro = () => {
+      nomeDoProjeto.value = "";
+      notificar(
+        TipoNotificacao.FALHA,
+        'Eita!',
+        'O projeto acoreu um erro!'
+      )
+      router.push('/projetos')
+    }
+
     const salvar = () => {
       if (props.id) {
         store.dispatch(ALTERAR_PROJETO, {
           id: props.id,
           nome: nomeDoProjeto.value
-        }).then( () => lidarComSucesso())
+        })
+          .then( () => lidarComSucessoDaAtualizacao())
+          .catch( () => lidarComErro())
       } else {
         store.dispatch(CADASTRAR_PROJETO, nomeDoProjeto.value)
-          .then( () => lidarComSucesso())
+          .then( () => lidarComSucessoCadasto())
+          .catch( () => lidarComErro())
       }
     }
 
