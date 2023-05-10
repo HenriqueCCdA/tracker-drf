@@ -40,3 +40,5 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             "project": {"view_name": "core:rdu-project"},
             "is_active": {"read_only": True},
         }
+
+        #Todo: Retorna o nome do projeto e o id

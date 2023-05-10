@@ -51,7 +51,7 @@ import Tarefa from "../components/Tarefa.vue";
 import Box from "../components/Box.vue";
 import { useStore } from "@/store";
 import { CADASTRAR_TAREFA, OBTER_PROJETOS, OBTER_TAREFAS, ALTERAR_TAREFA } from "@/store/tipo-acoes";
-import ITarefa from "@/interfaces/ITarefa";
+import {ITarefa} from "@/interfaces/ITarefa";
 import Modal from "@/components/Modal.vue";
 
 export default defineComponent({
