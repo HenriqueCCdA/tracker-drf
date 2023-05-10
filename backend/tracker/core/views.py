@@ -1,7 +1,11 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 
-from tracker.core.models import Project
-from tracker.core.serializers import ProjectSerializer
+from tracker.core.models import Project, Task
+from tracker.core.serializers import ProjectSerializer, TaskSerializer
 
 
 class RetrieveUpdateDestroyProject(RetrieveUpdateDestroyAPIView):
@@ -46,5 +50,24 @@ class ListCreateProject(ListCreateAPIView):
         return super().get(request, *args, **kwargs)
 
 
+class ListCreateTask(ListCreateAPIView):
+    serializer_class = TaskSerializer
+    queryset = Task.objects.filter(is_active=True)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if q := self.request.query_params.get("q"):
+            queryset = queryset.filter(description__icontains=q)
+        return queryset
+
+
+class RetrieveUpdateTask(RetrieveUpdateAPIView):
+    serializer_class = TaskSerializer
+    queryset = Task.objects.filter(is_active=True)
+
+
 rud_project = RetrieveUpdateDestroyProject.as_view()
 lc_project = ListCreateProject.as_view()
+
+lc_task = ListCreateTask.as_view()
+ru_task = RetrieveUpdateTask.as_view()

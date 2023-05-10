@@ -3,13 +3,11 @@ from rest_framework import status
 
 from tracker.core.models import Project
 
-URL = "core:lc-project"
+URL = resolve_url("core:lc-project")
 
 
 def test_positive(client_api, project_data):
-    url = resolve_url(URL)
-
-    resp = client_api.post(url, data=project_data, format="json")
+    resp = client_api.post(URL, data=project_data, format="json")
 
     assert resp.status_code == status.HTTP_201_CREATED
 
@@ -27,9 +25,7 @@ def test_positive(client_api, project_data):
 
 
 def test_negative_missing_field(client_api):
-    url = resolve_url(URL)
-
-    resp = client_api.post(url, data={}, format="json")
+    resp = client_api.post(URL, data={}, format="json")
 
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
 

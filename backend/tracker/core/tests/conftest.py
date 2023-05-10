@@ -1,9 +1,10 @@
 import pytest
+from django.shortcuts import resolve_url
 from faker import Faker
 from model_bakery import baker
 from rest_framework.test import APIClient
 
-from tracker.core.models import Project
+from tracker.core.models import Project, Task
 
 fake = Faker()
 
@@ -19,6 +20,11 @@ def project(db):
 
 
 @pytest.fixture
+def task(db, project):
+    return baker.make(Task, project=project)
+
+
+@pytest.fixture
 def project_list(db):
     baker.make(Project, _quantity=2, is_active=False)
     baker.make(Project, _quantity=3, is_active=True)
@@ -27,5 +33,31 @@ def project_list(db):
 
 
 @pytest.fixture
+def task_list(project):
+    baker.make(Task, _quantity=2, is_active=False, project=project)
+    baker.make(Task, _quantity=3, is_active=True, project=project)
+
+    return Task.objects.all()
+
+
+@pytest.fixture
 def project_data(db):
     return {"name": fake.sentence(nb_words=5)}
+
+
+@pytest.fixture
+def task_data(project):
+    return {
+        "description": fake.sentence(nb_words=5),
+        "duration": 1000,
+        "project": resolve_url("core:rdu-project", pk=project.pk),
+    }
+
+
+@pytest.fixture
+def update_task(task):
+    return {
+        "description": "New description",
+        "duration": 200,
+        "project": resolve_url("core:rdu-project", pk=task.project.pk),
+    }
