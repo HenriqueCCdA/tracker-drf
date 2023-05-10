@@ -1,34 +1,55 @@
 import pytest
 from django.shortcuts import resolve_url
+from model_bakery import baker
 from rest_framework import status
+
+from tracker.core.models import Project
 
 URL = "core:ru-task"
 
 
-def test_positive(client_api, update_task, task):
+@pytest.mark.parametrize(
+    "field",
+    [
+        "description",
+        "duration",
+    ],
+)
+def test_positive(client_api, update_task, task, field):
     url = resolve_url(URL, pk=task.pk)
 
-    resp = client_api.put(url, data=update_task, format="json")
+    data = {field: update_task[field]}
+
+    resp = client_api.patch(url, data=data, format="json")
 
     assert resp.status_code == status.HTTP_200_OK
 
     body = resp.json()
 
     task.refresh_from_db()
+    assert body[field] == getattr(task, field)
 
-    assert body["id"] == task.pk
-    assert body["description"] == task.description
-    assert body["duration"] == task.duration
-    assert body["project"] == f"http://testserver/project/{task.project.pk}/"
-    assert body["is_active"]
-    assert body["created_at"] == str(task.created_at.astimezone().isoformat())
-    assert body["modified_at"] == str(task.modified_at.astimezone().isoformat())
+
+def test_positive_update_project(client_api, task):
+    url = resolve_url(URL, pk=task.pk)
+
+    new_project = baker.make(Project)
+    data = {"project": resolve_url("core:rdu-project", pk=new_project.pk)}
+
+    resp = client_api.patch(url, data=data, format="json")
+
+    assert resp.status_code == status.HTTP_200_OK
+
+    body = resp.json()
+
+    task.refresh_from_db()
+    assert body["project"] == f"http://testserver/project/{new_project.pk}/"
 
 
 def test_negative_invalid_id(client_api, task):
     url = resolve_url(URL, pk=404)
 
-    resp = client_api.put(url)
+    resp = client_api.patch(url)
 
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
@@ -43,37 +64,13 @@ def test_negative_project_inative_should_return_404(client_api, task):
     task.is_active = False
     task.save()
 
-    resp = client_api.put(url)
+    resp = client_api.patch(url)
 
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
     body = resp.json()
 
     assert body == {"detail": "Não encontrado."}
-
-
-@pytest.mark.parametrize(
-    "field",
-    [
-        "description",
-        "duration",
-        "project",
-    ],
-)
-def test_negative_missing_field(client_api, field, update_task, task):
-    url = resolve_url(URL, pk=task.pk)
-
-    data = update_task.copy()
-
-    del data[field]
-
-    resp = client_api.put(url, data=data, format="json")
-
-    assert resp.status_code == status.HTTP_400_BAD_REQUEST
-
-    body = resp.json()
-
-    assert body[field] == ["Este campo é obrigatório."]
 
 
 @pytest.mark.parametrize(
@@ -86,12 +83,10 @@ def test_negative_missing_field(client_api, field, update_task, task):
         ("project", "/task/1/", "Hyperlink inválido - Combinação URL incorreta."),
     ],
 )
-def test_negative_invalid_fields(client_api, field, value, error, update_task, task):
+def test_negative_invalid_fields(client_api, field, value, error, task):
     url = resolve_url(URL, pk=task.pk)
 
-    data = update_task.copy()
-
-    data[field] = value
+    data = {field: value}
 
     resp = client_api.put(url, data=data, format="json")
 

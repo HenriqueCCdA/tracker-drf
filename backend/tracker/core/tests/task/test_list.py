@@ -1,4 +1,5 @@
 from django.shortcuts import resolve_url
+from model_bakery import baker
 from rest_framework import status
 
 from tracker.core.models import Task
@@ -27,3 +28,35 @@ def test_positive(client_api, task_list):
         assert r["is_active"]
         assert r["created_at"] == str(db.created_at.astimezone().isoformat())
         assert r["modified_at"] == str(db.modified_at.astimezone().isoformat())
+
+
+def test_positive_filter_by_description(client_api, project):
+    baker.make(Task, description="Casa", project=project)
+    baker.make(Task, description="CasaCom", project=project)
+    baker.make(Task, description="Com", project=project)
+
+    url = resolve_url(URL)
+
+    resp = client_api.get(url + "?q=Casa")
+
+    assert resp.status_code == status.HTTP_200_OK
+
+    body = resp.json()
+
+    assert body["count"] == 2
+
+
+def test_negative_filter_by_description(client_api, project):
+    baker.make(Task, description="Casa", project=project)
+    baker.make(Task, description="CasaCom", project=project)
+    baker.make(Task, description="Com", project=project)
+
+    url = resolve_url(URL)
+
+    resp = client_api.get(url + "?q=No")
+
+    assert resp.status_code == status.HTTP_200_OK
+
+    body = resp.json()
+
+    assert body["count"] == 0

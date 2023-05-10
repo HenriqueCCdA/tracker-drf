@@ -54,6 +54,12 @@ class ListCreateTask(ListCreateAPIView):
     serializer_class = TaskSerializer
     queryset = Task.objects.filter(is_active=True)
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if q := self.request.query_params.get("q"):
+            queryset = queryset.filter(description__icontains=q)
+        return queryset
+
 
 class RetrieveUpdateTask(RetrieveUpdateAPIView):
     serializer_class = TaskSerializer

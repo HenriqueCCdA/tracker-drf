@@ -9,7 +9,7 @@ def test_create(project):
 
 
 def test_str(project):
-    assert str(project) == "Projeto 1"
+    assert str(project) == project.name
 
 
 def test_default(project):

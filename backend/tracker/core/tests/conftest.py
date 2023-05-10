@@ -52,3 +52,12 @@ def task_data(project):
         "duration": 1000,
         "project": resolve_url("core:rdu-project", pk=project.pk),
     }
+
+
+@pytest.fixture
+def update_task(task):
+    return {
+        "description": "New description",
+        "duration": 200,
+        "project": resolve_url("core:rdu-project", pk=task.project.pk),
+    }
