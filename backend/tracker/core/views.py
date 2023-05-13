@@ -56,7 +56,7 @@ class ListCreateTask(ListCreateAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if q := self.request.query_params.get("q"):
+        if q := self.request.query_params.get("description"):
             queryset = queryset.filter(description__icontains=q)
         return queryset
 

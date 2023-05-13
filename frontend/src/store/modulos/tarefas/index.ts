@@ -17,17 +17,27 @@ export const tarefa: Module<EstadoTarefa, Estado> =  {
         [DEFINIR_TAREFAS](state, tarefas: ITarefaApi[]) {
             const tarefa_lista: ITarefa[] = []
             for(const t of tarefas){
+                console.log(t)
                 tarefa_lista.push({
                     "id": t.id,
                     "duracaoEmSegundos": t.duration,
-                    "projeto": {"id": "1", "nome": t.project},
+                    "projeto": {"id": t.project_id, "nome": t.project_name},
                     "descricao": t.description,
                 })
             }
+            console.log(tarefa_lista)
             state.tarefas = tarefa_lista
         },
-        [ADICIONA_TAREFA](state, tarefa: ITarefa) {
-            state.tarefas.push(tarefa)
+        [ADICIONA_TAREFA](state, tarefa: ITarefaApi) {
+
+            const tarefa_nova: ITarefa = {
+                "id": tarefa.id,
+                "duracaoEmSegundos": tarefa.duration,
+                "projeto": {"id": tarefa.project_id, "nome": tarefa.project_name},
+                "descricao": tarefa.description,
+            }
+
+            state.tarefas.push(tarefa_nova)
         },
         [ALTERA_TAREFA](state, tareda: ITarefa) {
             const index = state.tarefas.findIndex(t => t.id == tareda.id)
@@ -38,17 +48,30 @@ export const tarefa: Module<EstadoTarefa, Estado> =  {
         [OBTER_TAREFAS] ({ commit }, filtro: string) {
             let url = '/task/';
             if (filtro) {
-                url += '?descricao=' + filtro
+                url += '?description=' + filtro
             }
             http.get(url)
                 .then(resposta => commit(DEFINIR_TAREFAS, resposta.data.results))
         },
         [CADASTRAR_TAREFA] ({commit}, tarefa: ITarefa) {
-            return http.post('/tarefas', tarefa)
+
+            const payload = {
+                "description": tarefa.descricao,
+                "duration": tarefa.duracaoEmSegundos,
+                "project": tarefa.projeto.id,
+            }
+            return http.post('/task/', payload)
                 .then(resposta => commit(ADICIONA_TAREFA, resposta.data))
         },
         [ALTERAR_TAREFA] ({ commit }, tarefa: ITarefa) {
-            return http.put(`/tarefas/${tarefa.id}`, tarefa)
+
+            const payload = {
+                "description": tarefa.descricao,
+                "duration": tarefa.duracaoEmSegundos,
+                "project": tarefa.projeto.id,
+            }
+
+            return http.put(`/task/${tarefa.id}/`, payload)
                 .then(() => commit(ALTERA_TAREFA, tarefa))
         },
     }

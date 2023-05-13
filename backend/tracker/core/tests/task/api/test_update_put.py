@@ -19,7 +19,9 @@ def test_positive(client_api, update_task, task):
     assert body["id"] == task.pk
     assert body["description"] == task.description
     assert body["duration"] == task.duration
-    assert body["project"] == f"http://testserver/project/{task.project.pk}/"
+    assert body["project_id"] == task.project.pk
+    assert body["project_name"] == task.project.name
+    assert body["project_url"] == f"http://testserver/project/{task.project.pk}/"
     assert body["is_active"]
     assert body["created_at"] == str(task.created_at.astimezone().isoformat())
     assert body["modified_at"] == str(task.modified_at.astimezone().isoformat())
@@ -81,9 +83,8 @@ def test_negative_missing_field(client_api, field, update_task, task):
     [
         ("duration", -1, "Certifque-se de que este valor seja maior ou igual a 0."),
         ("duration", "aa", "Um número inteiro válido é exigido."),
-        ("project", 1, "Tipo incorreto. Necessário string URL, recebeu int."),
-        ("project", "/project/1/", "Hyperlink inválido - Objeto não existe."),
-        ("project", "/task/1/", "Hyperlink inválido - Combinação URL incorreta."),
+        ("project", 1, 'Pk inválido "1" - objeto não existe.'),
+        ("project", "/project/1/", "Tipo incorreto. Esperado valor pk, recebeu str."),
     ],
 )
 def test_negative_invalid_fields(client_api, field, value, error, update_task, task):

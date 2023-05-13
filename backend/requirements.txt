@@ -18,7 +18,7 @@ django==4.2.1
     #   django-extensions
     #   djangorestframework
     #   drf-spectacular
-django-cors-headers==3.14.0
+django-cors-headers==4.0.0
     # via -r requirements.in
 django-extensions==3.2.1
     # via -r requirements.in

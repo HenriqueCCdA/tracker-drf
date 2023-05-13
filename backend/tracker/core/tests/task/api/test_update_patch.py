@@ -34,7 +34,7 @@ def test_positive_update_project(client_api, task):
     url = resolve_url(URL, pk=task.pk)
 
     new_project = baker.make(Project)
-    data = {"project": resolve_url("core:rdu-project", pk=new_project.pk)}
+    data = {"project": new_project.pk}
 
     resp = client_api.patch(url, data=data, format="json")
 
@@ -43,7 +43,9 @@ def test_positive_update_project(client_api, task):
     body = resp.json()
 
     task.refresh_from_db()
-    assert body["project"] == f"http://testserver/project/{new_project.pk}/"
+    assert body["project_id"] == new_project.pk
+    assert body["project_name"] == new_project.name
+    assert body["project_url"] == f"http://testserver/project/{new_project.pk}/"
 
 
 def test_negative_invalid_id(client_api, task):
@@ -78,9 +80,8 @@ def test_negative_project_inative_should_return_404(client_api, task):
     [
         ("duration", -1, "Certifque-se de que este valor seja maior ou igual a 0."),
         ("duration", "aa", "Um número inteiro válido é exigido."),
-        ("project", 1, "Tipo incorreto. Necessário string URL, recebeu int."),
-        ("project", "/project/1/", "Hyperlink inválido - Objeto não existe."),
-        ("project", "/task/1/", "Hyperlink inválido - Combinação URL incorreta."),
+        ("project", 1, 'Pk inválido "1" - objeto não existe.'),
+        ("project", "/task/1/", "Tipo incorreto. Esperado valor pk, recebeu str."),
     ],
 )
 def test_negative_invalid_fields(client_api, field, value, error, task):

@@ -1,15 +1,16 @@
 import {IProjeto} from "./IProjeto";
 
 export interface ITarefa {
+  id: string,
   duracaoEmSegundos: number,
   descricao: string,
   projeto: IProjeto,
-  id: number
 }
 
 export interface ITarefaApi {
+  id: string,
   description: string,
   duration: number,
-  project:  string,
-  id: number
+  project_id: string,
+  project_name: string,
 }

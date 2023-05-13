@@ -24,7 +24,9 @@ def test_positive(client_api, task_list):
         assert r["id"] == db.pk
         assert r["description"] == db.description
         assert r["duration"] == db.duration
-        assert r["project"] == f"http://testserver/project/{db.project.pk}/"
+        assert r["project_id"] == db.project.pk
+        assert r["project_name"] == db.project.name
+        assert r["project_url"] == f"http://testserver/project/{db.project.pk}/"
         assert r["is_active"]
         assert r["created_at"] == str(db.created_at.astimezone().isoformat())
         assert r["modified_at"] == str(db.modified_at.astimezone().isoformat())
@@ -37,7 +39,7 @@ def test_positive_filter_by_description(client_api, project):
 
     url = resolve_url(URL)
 
-    resp = client_api.get(url + "?q=Casa")
+    resp = client_api.get(url + "?description=Casa")
 
     assert resp.status_code == status.HTTP_200_OK
 
@@ -53,7 +55,7 @@ def test_negative_filter_by_description(client_api, project):
 
     url = resolve_url(URL)
 
-    resp = client_api.get(url + "?q=No")
+    resp = client_api.get(url + "?description=No")
 
     assert resp.status_code == status.HTTP_200_OK
 

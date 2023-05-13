@@ -1,5 +1,4 @@
 import pytest
-from django.shortcuts import resolve_url
 from faker import Faker
 from model_bakery import baker
 from rest_framework.test import APIClient
@@ -50,7 +49,7 @@ def task_data(project):
     return {
         "description": fake.sentence(nb_words=5),
         "duration": 1000,
-        "project": resolve_url("core:rdu-project", pk=project.pk),
+        "project": project.pk,
     }
 
 
@@ -59,5 +58,5 @@ def update_task(task):
     return {
         "description": "New description",
         "duration": 200,
-        "project": resolve_url("core:rdu-project", pk=task.project.pk),
+        "project": task.project.pk,
     }

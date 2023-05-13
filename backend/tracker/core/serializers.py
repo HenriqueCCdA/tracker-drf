@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from tracker.core.models import Project, Task
+from tracker.core.models import PROJECT_NAME_LENGTH, Project, Task
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,6 +22,22 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
+    project = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects.filter(is_active=True),
+        write_only=True,
+    )
+    project_id = serializers.IntegerField(read_only=True)
+    project_name = serializers.CharField(
+        max_length=PROJECT_NAME_LENGTH,
+        source="project",
+        read_only=True,
+    )
+    project_url = serializers.HyperlinkedRelatedField(
+        view_name="core:rdu-project",
+        read_only=True,
+        source="project",
+    )
+
     class Meta:
         model = Task
         fields = (
@@ -29,6 +45,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             "description",
             "duration",
             "project",
+            "project_id",
+            "project_name",
+            "project_url",
             "is_active",
             "url",
             "created_at",
@@ -37,8 +56,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
         extra_kwargs = {
             "url": {"view_name": "core:ru-task"},
-            "project": {"view_name": "core:rdu-project"},
             "is_active": {"read_only": True},
+            # "project": {"view_name": "core:rdu-project"},
         }
-
-        #Todo: Retorna o nome do projeto e o id
