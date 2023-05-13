@@ -16,7 +16,9 @@ def test_positive(client_api, task):
     assert body["id"] == task.pk
     assert body["description"] == task.description
     assert body["duration"] == task.duration
-    assert body["project"] == f"http://testserver/project/{task.project.pk}/"
+    assert body["project_id"] == task.project.pk
+    assert body["project_name"] == task.project.name
+    assert body["project_url"] == f"http://testserver/project/{task.project.pk}/"
     assert body["is_active"]
     assert body["created_at"] == str(task.created_at.astimezone().isoformat())
     assert body["modified_at"] == str(task.modified_at.astimezone().isoformat())

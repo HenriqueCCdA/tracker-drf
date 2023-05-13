@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+PROJECT_NAME_LENGTH = 100
+
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(_("Creation Date and Time"), auto_now_add=True)
@@ -13,7 +15,7 @@ class BaseModel(models.Model):
 
 
 class Project(BaseModel):
-    name = models.CharField(_("Name"), max_length=100)
+    name = models.CharField(_("Name"), max_length=PROJECT_NAME_LENGTH)
 
     class Meta:
         ordering = ("name",)
